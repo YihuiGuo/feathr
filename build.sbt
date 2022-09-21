@@ -54,6 +54,7 @@ val jdbcDrivers = Seq(
   "com.microsoft.sqlserver" % "mssql-jdbc" % "10.2.0.jre8",
   "net.snowflake" % "snowflake-jdbc" % "3.13.18",
   "org.postgresql" % "postgresql" % "42.3.4",
+  "com.aerospike" % "aerospike-jdbc" % "1.3.0"
 )
 
 // For azure

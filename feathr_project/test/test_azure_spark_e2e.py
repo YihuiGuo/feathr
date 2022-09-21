@@ -312,7 +312,7 @@ def test_feathr_materialize_to_aerospike():
     os.environ['SPARK_CONFIG__DATABRICKS__WORK_DIR'] = ''.join(['dbfs:/feathrazure_cijob','_', str(now.minute), '_', str(now.second), '_', str(now.microsecond)]) 
     os.environ['SPARK_CONFIG__AZURE_SYNAPSE__WORKSPACE_DIR'] = ''.join(['abfss://feathrazuretest3fs@feathrazuretest3storage.dfs.core.windows.net/feathr_github_ci','_', str(now.minute), '_', str(now.second) ,'_', str(now.microsecond)]) 
     
-    client = FeathrClient(config_path="feathr_config.yaml")
+    client: FeathrClient = basic_test_setup(os.path.join(test_workspace_dir, "feathr_config.yaml"))
     batch_source = HdfsSource(name="nycTaxiBatchSource",
                               path="wasbs://public@azurefeathrstorage.blob.core.windows.net/sample_data/green_tripdata_2020-04.csv",
                               event_timestamp_column="lpep_dropoff_datetime",
@@ -382,9 +382,13 @@ def test_feathr_materialize_to_aerospike():
         2020, 5, 20), end=datetime(2020, 5, 20), step=timedelta(days=1))
 
     now = datetime.now()
-    os.environ[f"aerospike_USER"] = "feathruser"
-    os.environ[f"aerospike_PASSWORD"] = "feathr"
-    as_sink = AerospikeSink(name="aerospike",seedhost="20.57.186.153", port=3000, namespace="test", setname="test")
+    os.environ[f"AEROSPIKE_USER"] = "feathruser"
+    os.environ[f"AEROSPIKE_PASSWORD"] = "feathr"
+    os.environ[f"JDBC_DRIVER"]= "com.aerospike.jdbc.AerospikeDriver"
+    as_sink = JdbcSink( name="aerospike",
+                        url="jdbc:aerospike:20.57.186.153:3000/test;encrypt=true;",
+                        dbtable=''.join(['feathrazure_cijob','_', str(now.minute), '_', str(now.second)]),
+                        auth="USERPASS")
     settings = MaterializationSettings("nycTaxiTable",
                                        sinks=[as_sink],
                                        feature_names=[
