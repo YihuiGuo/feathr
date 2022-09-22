@@ -393,6 +393,10 @@ def test_feathr_materialize_to_aerospike():
     client.materialize_features(settings)
     # assuming the job can successfully run; otherwise it will throw exception
     client.wait_job_to_finish(timeout_sec=Constants.SPARK_JOB_TIMEOUT_SECONDS)
+    get_online_features_result = client.get_online_features('test', '265',['avgfare', 'maxfare'])
+    print(get_online_features_result)
+
+
 if __name__ == "__main__":
     test_feathr_materialize_to_aerospike()
     test_feathr_get_offline_features_to_sql()
