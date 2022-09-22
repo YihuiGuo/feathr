@@ -47,6 +47,7 @@ __all__ = [
     'HdfsSink',
     'MonitoringSqlSink',
     'AerospikeSink',
+    'AsGenericSink',
     'FeatureQuery',
     'LookupFeature',
     'Aggregation',

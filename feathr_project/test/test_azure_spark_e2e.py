@@ -15,7 +15,7 @@ from feathr import (BackfillTime, MaterializationSettings)
 from feathr import FeathrClient
 from feathr import FeatureQuery
 from feathr import ObservationSettings
-from feathr import RedisSink, HdfsSink, JdbcSink,AerospikeSink
+from feathr import RedisSink, HdfsSink, JdbcSink,AsGenericSink
 from feathr import TypedKey
 from feathr import ValueType
 from feathr.utils.job_utils import get_result_df
@@ -384,11 +384,13 @@ def test_feathr_materialize_to_aerospike():
     now = datetime.now()
     os.environ[f"AEROSPIKE_USER"] = "feathruser"
     os.environ[f"AEROSPIKE_PASSWORD"] = "feathr"
-    os.environ[f"JDBC_DRIVER"]= "com.aerospike.jdbc.AerospikeDriver"
-    as_sink = JdbcSink( name="aerospike",
-                        url="jdbc:aerospike:20.57.186.153:3000/test;encrypt=true;",
-                        dbtable=''.join(['feathrazure_cijob','_', str(now.minute), '_', str(now.second)]),
-                        auth="USERPASS")
+    as_sink = AsGenericSink(name="aerospike", options={
+        "driver": "com.aerospike.jdbc.AerospikeDriver",
+        "url": "jdbc:aerospike:20.57.186.153:3000/test;encrypt=true;",
+        "dbtable": 'test',
+        "user": "${AEROSPIKE_USER}",
+        "password": "${AEROSPIKE_PASSWORD}"
+        })
     settings = MaterializationSettings("nycTaxiTable",
                                        sinks=[as_sink],
                                        feature_names=[

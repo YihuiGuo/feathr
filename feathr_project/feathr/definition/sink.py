@@ -254,7 +254,21 @@ class GenericSink(Sink):
         One-line JSON string, used by job submitter
         """
         return json.dumps(self._to_dict())
+
+class AsGenericSink(GenericSink):
+    def __init__(self, name: str, options: Dict[str, str] = {}) -> None:    
+        super().__init__(format = "jdbc", mode="APPEND", options=options)
+        self.name = name
+
+    def support_offline(self) -> bool:
+        return False
     
+    def support_online(self) -> bool:
+        return True
+
+    def get_required_properties(self) -> List[str]:
+        return [self.name.upper() + "_USER", self.name.upper() + "_PASSWORD"]
+        
 class CosmosDbSink(GenericSink):
     """
     CosmosDbSink is a sink that is used to store online feature data in CosmosDB.
