@@ -349,6 +349,36 @@ class CosmosDbSource(GenericSource):
                          event_timestamp_column=event_timestamp_column, timestamp_format=timestamp_format,
                          registry_tags=registry_tags)
 
+class AerospikeSource(GenericSource):
+    """
+    Use Aerospike as the data source
+    """
+    def __init__(self,
+                name: str,
+                seedhost:str,
+                port:int,
+                namespace:str,
+                setname:str,
+                preprocessing: Optional[Callable] = None,
+                event_timestamp_column: Optional[str] = None,
+                timestamp_format: Optional[str] = "epoch",
+                registry_tags: Optional[Dict[str, str]] = None):
+        options = {
+            "aerospike.seedhost":seedhost,
+            "aerospike.port":str(port),
+            "aerospike.namespace":namespace,
+            "aerospike.user":"${%s_USER}" % name.upper(),
+            "aerospike.password":"${%s_PASSWORD}" % name.upper(),
+            "aerospike.set":setname
+            }
+        super().__init__(name,
+                         format="aerospike",
+                         mode="APPEND",
+                         options=options,
+                         preprocessing=preprocessing,
+                         event_timestamp_column=event_timestamp_column, timestamp_format=timestamp_format,
+                         registry_tags=registry_tags)
+
 class ElasticSearchSource(GenericSource):
     """
     Use ElasticSearch as the data source
